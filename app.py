@@ -1,12 +1,112 @@
-from flask import Flask
+from flask import Flask, render_template, request, jsonify
+import cv2
+import os
+import numpy as np
+from tinydb import TinyDB, Query
 
 app = Flask(__name__)
 
+class ProcessedImage:
+  def __init__(self, path, name, descriptors, image):
+    self.path = path
+    self.name = name
+    self.descriptors = descriptors
+    self.image = image
+class ImageMatch:
+  def __init__(self, score, image1, image2, same):
+    self.score = score
+    self.image1 = image1
+    self.image2 = image2
+    self.same = same
 
+def object_to_dict(obj):
+    obj_dict = {}
+    for attr in vars(obj):
+        if attr != 'image' and attr != 'descriptors':
+            value = getattr(obj, attr)
+            if isinstance(value, ProcessedImage):
+                value = object_to_dict(value)
+            obj_dict[attr] = value
+    return obj_dict
+
+def processImageDirectory(path):
+    image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp']
+    images = []
+
+    obj = os.scandir(path)
+
+    for entry in obj:
+        if entry.is_file():
+            if any(entry.name.lower().endswith(ext) for ext in image_extensions):
+                processed_image = processImage(path, entry.name)
+                images.append(processed_image)
+    return images
+
+def processImage(path, name):
+    sift = cv2.SIFT_create()
+
+    img = cv2.imread(path + '/' + name)
+
+    keypoints, descriptors = sift.detectAndCompute(img, None)
+    return ProcessedImage(path, name, descriptors, img)
+
+def matchImages(directory1, directory2, k = 2, range = 0.75):
+    bf = cv2.BFMatcher()
+
+    image_matches = []
+
+    for image1 in directory1:
+        for image2 in directory2:
+
+            if np.array_equal(image1.image, image2.image):
+                image_match = ImageMatch(0, image1, image2, True)
+                image_matches.append(image_match)
+                continue
+
+            matches = bf.knnMatch(image1.descriptors, image2.descriptors, k)
+            good = []
+
+            for m, n in matches:
+                if m.distance < range * n.distance:
+                    good.append([m])
+
+            image_match = ImageMatch(len(good), image1, image2, False)
+            image_matches.append(image_match)
+
+    return image_matches
+
+def saveItemsToDb(db, items):
+    for item in items:
+        item_dict = object_to_dict(item)
+        db.insert(item_dict)
 @app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
+def index():
+    return render_template('index.html')
 
+@app.route('/load', methods=['POST'])
+def load():
+    try:
+        matchesDb = TinyDB('matches_db.json')
+        matchesDb.truncate();
+
+        data = request.get_json()
+        path1 = data['path1']
+        path2 = data['path2']
+
+        processed_img1 = processImageDirectory(path1)
+        processed_img2 = processImageDirectory(path2)
+
+        if not processed_img1 or not processed_img2:
+            return jsonify(message="No images found"), 400
+
+        kNN = int(data['kNN'])
+        range = float(data['range'])
+        matches = matchImages(processed_img1, processed_img2, kNN, range)
+        saveItemsToDb(matchesDb, matches)
+
+        return jsonify(message="Images processed and saved successfully"), 200
+    except Exception as e:
+        return jsonify(message=str(e)), 500
 
 if __name__ == '__main__':
     app.run()
