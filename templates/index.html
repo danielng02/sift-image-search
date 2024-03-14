@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podobnostní spojení na databázi obrázků</title>
+    <link rel="stylesheet" href="styles.css"> <!-- You can style the UI using CSS -->
+</head>
+<body>
+    <div class="container">
+        <h1>Podobnostní spojení na databázi obrázků</h1>
+        <div>
+            <label for="range">Range:</label>
+            <input type="number" id="range" min="0" value="0.75" step="0.01" max="1">
+            <label for="kNN">kNN predicate:</label>
+            <input type="number" id="kNN" min="0" step="1" value="10">
+        </div>
+        <br>
+        <div>
+            <input type="text" id="path1" placeholder="Enter path to 1st directory of images">
+        </div>
+        <div>
+            <input type="text" id="path2" placeholder="Enter path to 2nd directory of images">
+            <button onclick="load()">Load</button>
+        </div>
+        <br>
+        <div>
+            <label id="message"></label>
+        </div>
+        <br>
+        <div>
+            <button onclick="visualise()">Visualise</button>
+        </div>
+        <br>
+        <div id="results">
+            <!-- Similar images will be displayed here -->
+        </div>
+    </div>
+
+    <script src="./static/script.js"></script> <!-- JavaScript code for the functionality -->
+</body>
+</html>
