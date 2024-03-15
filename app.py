@@ -50,9 +50,25 @@ def processImage(path, name):
     keypoints, descriptors = sift.detectAndCompute(img, None)
     return ProcessedImage(path, name, descriptors, img)
 
-def matchImages(directory1, directory2, k = 2, range = 0.75):
+def knnMatchGoodDescriptors(image1, image2, k = 2, range_ratio = 0.75):
     bf = cv2.BFMatcher()
 
+    knn_matches = bf.knnMatch(image1.descriptors, image2.descriptors, k)
+    good = []
+
+    for match_list in knn_matches:
+        pass_test = True
+        for i in range(1, k):
+            if match_list[0].distance >= range_ratio * match_list[i].distance:
+                pass_test = False
+                break
+        if pass_test:
+            good.append(match_list[0])
+
+
+    return good
+
+def matchImages(directory1, directory2, k = 2, range_ratio = 0.75):
     image_matches = []
 
     for image1 in directory1:
@@ -63,12 +79,7 @@ def matchImages(directory1, directory2, k = 2, range = 0.75):
                 image_matches.append(image_match)
                 continue
 
-            matches = bf.knnMatch(image1.descriptors, image2.descriptors, k)
-            good = []
-
-            for m, n in matches:
-                if m.distance < range * n.distance:
-                    good.append([m])
+            good = knnMatchGoodDescriptors(image1, image2, k, range_ratio)
 
             image_match = ImageMatch(len(good), image1, image2, False)
             image_matches.append(image_match)
