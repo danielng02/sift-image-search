@@ -2,8 +2,8 @@ from flask import Flask, render_template, request, jsonify
 import cv2
 import os
 import numpy as np
-from tinydb import TinyDB, Query
 from tinydb import TinyDB
+import pandas
 
 app = Flask(__name__)
 
@@ -126,6 +126,19 @@ def load_directories():
         return jsonify(message="Images processed and saved successfully"), 200
     except Exception as e:
         return jsonify(message=str(e)), 500
+
+
+@app.route('/visualise', methods=['POST', 'GET'])
+def visualise():
+    try:
+        data = pandas.read_json('./matches_db.json')
+
+        df = pandas.json_normalize(data['_default'], sep='_')
+        return render_template('visualisation.html', tables=[df.to_html(classes='data', header="true")])
+
+    except Exception as e:
+        return jsonify(message=str(e)), 500
+
 
 if __name__ == '__main__':
     app.run()
