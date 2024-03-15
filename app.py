@@ -101,18 +101,14 @@ def load():
         matchesDb.truncate();
 
         data = request.get_json()
-        path1 = data['path1']
-        path2 = data['path2']
 
-        processed_img1 = processImageDirectory(path1)
-        processed_img2 = processImageDirectory(path2)
+        processed_img1 = processImageDirectory(data["path1"])
+        processed_img2 = processImageDirectory(data["path2"])
 
         if not processed_img1 or not processed_img2:
             return jsonify(message="No images found"), 400
 
-        kNN = int(data['kNN'])
-        range = float(data['range'])
-        matches = matchImages(processed_img1, processed_img2, kNN, range)
+        matches = matchImages(processed_img1, processed_img2, int(data["kNN"]), float(data["range"]))
         saveItemsToDb(matchesDb, matches)
 
         return jsonify(message="Images processed and saved successfully"), 200
