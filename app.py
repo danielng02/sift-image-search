@@ -3,21 +3,26 @@ import cv2
 import os
 import numpy as np
 from tinydb import TinyDB, Query
+from tinydb import TinyDB
 
 app = Flask(__name__)
 
+
 class ProcessedImage:
-  def __init__(self, path, name, descriptors, image):
-    self.path = path
-    self.name = name
-    self.descriptors = descriptors
-    self.image = image
+    def __init__(self, path, name, descriptors, image):
+        self.path = path
+        self.name = name
+        self.descriptors = descriptors
+        self.image = image
+
+
 class ImageMatch:
-  def __init__(self, score, image1, image2, same):
-    self.score = score
-    self.image1 = image1
-    self.image2 = image2
-    self.same = same
+    def __init__(self, score, image1, image2, same):
+        self.score = score
+        self.image1 = image1
+        self.image2 = image2
+        self.same = same
+
 
 def object_to_dict(obj):
     obj_dict = {}
@@ -29,7 +34,8 @@ def object_to_dict(obj):
             obj_dict[attr] = value
     return obj_dict
 
-def processImageDirectory(path):
+
+def process_image_directory(path):
     image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp']
     images = []
 
@@ -38,11 +44,12 @@ def processImageDirectory(path):
     for entry in obj:
         if entry.is_file():
             if any(entry.name.lower().endswith(ext) for ext in image_extensions):
-                processed_image = processImage(path, entry.name)
+                processed_image = process_image(path, entry.name)
                 images.append(processed_image)
     return images
 
-def processImage(path, name):
+
+def process_image(path, name):
     sift = cv2.SIFT_create()
 
     img = cv2.imread(path + '/' + name)
@@ -50,7 +57,8 @@ def processImage(path, name):
     keypoints, descriptors = sift.detectAndCompute(img, None)
     return ProcessedImage(path, name, descriptors, img)
 
-def knnMatchGoodDescriptors(image1, image2, k = 2, range_ratio = 0.75):
+
+def knn_match_good_descriptors(image1, image2, k=2, range_ratio=0.75):
     bf = cv2.BFMatcher()
 
     knn_matches = bf.knnMatch(image1.descriptors, image2.descriptors, k)
@@ -65,10 +73,10 @@ def knnMatchGoodDescriptors(image1, image2, k = 2, range_ratio = 0.75):
         if pass_test:
             good.append(match_list[0])
 
-
     return good
 
-def matchImages(directory1, directory2, k = 2, range_ratio = 0.75):
+
+def match_images(directory1, directory2, k=2, range_ratio=0.75):
     image_matches = []
 
     for image1 in directory1:
@@ -79,37 +87,41 @@ def matchImages(directory1, directory2, k = 2, range_ratio = 0.75):
                 image_matches.append(image_match)
                 continue
 
-            good = knnMatchGoodDescriptors(image1, image2, k, range_ratio)
+            good = knn_match_good_descriptors(image1, image2, k, range_ratio)
 
             image_match = ImageMatch(len(good), image1, image2, False)
             image_matches.append(image_match)
 
     return image_matches
 
-def saveItemsToDb(db, items):
+
+def save_items_to_db(db, items):
     for item in items:
         item_dict = object_to_dict(item)
         db.insert(item_dict)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
 @app.route('/load', methods=['POST'])
-def load():
+def load_directories():
     try:
-        matchesDb = TinyDB('matches_db.json')
-        matchesDb.truncate();
+        matches_db = TinyDB('matches_db.json')
+        matches_db.truncate()
 
         data = request.get_json()
 
-        processed_img1 = processImageDirectory(data["path1"])
-        processed_img2 = processImageDirectory(data["path2"])
+        processed_img1 = process_image_directory(data["path1"])
+        processed_img2 = process_image_directory(data["path2"])
 
         if not processed_img1 or not processed_img2:
             return jsonify(message="No images found"), 400
 
-        matches = matchImages(processed_img1, processed_img2, int(data["kNN"]), float(data["range"]))
-        saveItemsToDb(matchesDb, matches)
+        matches = match_images(processed_img1, processed_img2, int(data["kNN"]), float(data["range"]))
+        save_items_to_db(matches_db, matches)
 
         return jsonify(message="Images processed and saved successfully"), 200
     except Exception as e:
