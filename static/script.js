@@ -1,8 +1,6 @@
 function load() {
     const path1 = document.getElementById("path1").value;
     const path2 = document.getElementById("path2").value;
-    const kNN = document.getElementById("kNN").value;
-    const range = document.getElementById("range").value;
 
     const messageLabel = document.getElementById("message");
     messageLabel.innerText = "";
@@ -16,8 +14,6 @@ function load() {
         body: JSON.stringify({
             path1: path1,
             path2: path2,
-            kNN: kNN,
-            range: range
         })
     })
     .then(response => response.json())
@@ -30,9 +26,18 @@ function loadResult(message) {
     messageLabel.innerText = message;
 }
 function visualise() {
+    const kNN = document.getElementById("kNN").value;
+    const range = document.getElementById("range").value;
+    const rangeEnabled = document.getElementById("rangeEnabled").checked;
+
+    // Create the URL with parameters
+    const url = new URL('/visualise', window.location.origin);
+    url.searchParams.append('kNN', kNN);
+    url.searchParams.append('range', range);
+    url.searchParams.append('rangeEnabled', rangeEnabled);
 
     // Make AJAX request to Flask backend
-    fetch('/visualise', {
+    fetch(url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -40,7 +45,7 @@ function visualise() {
     })
     .then(() => {
         // Navigate to the /visualise page
-        window.location.href = '/visualise';
+        window.location.href = url;
     })
     .catch(error => console.error('Error:', error));
 }
