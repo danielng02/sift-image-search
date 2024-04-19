@@ -38,9 +38,6 @@ def json_to_df(data):
     for key, values in data.items():
         df = pandas.DataFrame(values)
         try:  
-            df['image1_name'] = df['image1_name'].apply(lambda x: x if isinstance(x, str) else x['path'])
-            df['image2_name'] = df['image2_name'].apply(lambda x: x if isinstance(x, str) else x['path'])
-            df['image'] = key
             dfs.append(df)
         except Exception as e:
             continue
