@@ -87,15 +87,15 @@
             <td>{{ record.image1_name }}</td>
             <td colspan="1">
               <img
-                src="{{ url_for('image_display', directory=record.image1_path, filename=record.image1_name) }}"
-                alt="Image"
+              src="{{ url_for('image_display', path=record.image1_path + '/' + record.image1_name) }}"
+              alt="Image"
               />
             </td>
             <td>{{ record.image2_name }}</td>
             <td colspan="1">
               <img
-                src="{{ url_for('image_display', directory=record.image2_path, filename=record.image2_name) }}"
-                alt="Image"
+              src="{{ url_for('image_display', path=record.image2_path + '/' + record.image2_name) }}"
+              alt="Image"
               />
             </td>
             <td>{{ record.score }}</td>
