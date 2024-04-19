@@ -67,9 +67,13 @@
             <input type="radio" name="query" id="rangeEnabled">
             <label for="range">Range:</label>
             <input type="number" id="range" min="0" value="20" step="1">
+            <label id="rangeParameterMessage"></label>
+        </div>
+        <div>
             <input type="radio" name="query" id="kEnabled">
             <label for="kNN">kNN predicate:</label>
             <input type="number" id="kNN" min="2" max="10" step="1" value="2">
+            <label id="kNNparameterMessage"></label>
         </div>
         <br>
         <div>
@@ -81,7 +85,7 @@
         </div>
         <br>
         <div>
-            <label id="message"></label>
+            <label id="loadMessage"></label>
         </div>
         <br>
         <div>

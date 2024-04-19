@@ -5,7 +5,6 @@ function load() {
     const messageLabel = document.getElementById("message");
     messageLabel.innerText = "";
 
-    // Make AJAX request to Flask backend
     fetch('/load', {
         method: 'POST',
         headers: {
@@ -22,21 +21,55 @@ function load() {
 }
 
 function loadResult(message) {
-    const messageLabel = document.getElementById("message");
+    const messageLabel = document.getElementById("loadMessage");
     messageLabel.innerText = message;
 }
+
+function checkQueryParameters(kNN, range) {
+    let messageLabel = document.getElementById("kNNparameterMessage");
+
+    if(document.getElementById("kEnabled").checked)
+    {
+        if(kNN === "" || isNaN(Number(kNN))) {
+            messageLabel.innerText = "Invalid value in kNN query parameter";
+            return false;
+        }
+        messageLabel.innerText = "";
+        return true;
+    }
+
+    messageLabel.innerText = "";
+
+    if(document.getElementById("rangeEnabled").checked)
+    {
+        messageLabel = document.getElementById("rangeParameterMessage");
+        if(range === "" || isNaN(Number(range))) {
+            messageLabel.innerText = "Invalid value in range query parameter";
+            return false;
+        }
+        messageLabel.innerText = "";
+        return true;
+    }
+
+    messageLabel.innerText = "";
+    return true;
+}
+
 function visualise() {
     const kNN = document.getElementById("kNN").value;
     const range = document.getElementById("range").value;
+
+    if(!checkQueryParameters(kNN, range)) {
+        return;
+    }
+
     const rangeEnabled = document.getElementById("rangeEnabled").checked;
 
-    // Create the URL with parameters
     const url = new URL('/visualise', window.location.origin);
     url.searchParams.append('kNN', kNN);
     url.searchParams.append('range', range);
     url.searchParams.append('rangeEnabled', rangeEnabled);
 
-    // Make AJAX request to Flask backend
     fetch(url, {
         method: 'GET',
         headers: {
@@ -44,7 +77,6 @@ function visualise() {
         }
     })
     .then(() => {
-        // Navigate to the /visualise page
         window.location.href = url;
     })
     .catch(error => console.error('Error:', error));
