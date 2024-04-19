@@ -77,27 +77,31 @@
           <th>Image2 name</th>
           <th>Image2</th>
           <th>Score</th>
+          <th>Same images</th>
         </tr>
       </thead>
       <tbody>
-        {% for record in records %}
-        <tr>
-          <td>{{ record.image1_name }}</td>
-          <td colspan="1">
-            <img
-              src="{{ url_for('image_display', directory=record.image1_path, filename=record.image1_name) }}"
-              alt="Image"
-            />
-          </td>
-          <td>{{ record.image2_name }}</td>
-          <td colspan="1">
-            <img
-              src="{{ url_for('image_display', directory=record.image2_path, filename=record.image2_name) }}"
-              alt="Image"
-            />
-          </td>
-          <td>{{ record.score }}</td>
-        </tr>
+        {% for key in records %}
+          {% for record in records[key] %}
+          <tr>
+            <td>{{ record.image1_name }}</td>
+            <td colspan="1">
+              <img
+                src="{{ url_for('image_display', directory=record.image1_path, filename=record.image1_name) }}"
+                alt="Image"
+              />
+            </td>
+            <td>{{ record.image2_name }}</td>
+            <td colspan="1">
+              <img
+                src="{{ url_for('image_display', directory=record.image2_path, filename=record.image2_name) }}"
+                alt="Image"
+              />
+            </td>
+            <td>{{ record.score }}</td>
+            <td>{{ record.same }}</td>
+          </tr>
+          {% endfor %}
         {% endfor %}
       </tbody>
     </table>

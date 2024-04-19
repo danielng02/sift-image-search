@@ -1,4 +1,4 @@
-from queries import knnQuery, rangeQuery, json_to_df
+from queries import knnQuery, rangeQuery
 from database import truncateOrCreateDB, save_items_to_db
 from image_processing import process_image_directory, match_images
 
@@ -39,7 +39,7 @@ def load_directories():
     except Exception as e:
         return jsonify(message=str(e)), 500
 
-@app.route('/visualise', methods=['POST', 'GET'])
+@app.route('/visualise', methods=['GET'])
 def visualise():
     try:
         if request.args.get('rangeEnabled') == 'true':
@@ -49,9 +49,7 @@ def visualise():
         else:
             raise Exception("No query type selected")
 
-        df = json_to_df(queryResult)
-        records = df.to_dict('records')
-        return render_template('visualisation.html', records=records)
+        return render_template('visualisation.html', records=queryResult)
 
     except Exception as e:
         return jsonify(message=str(e)), 500
