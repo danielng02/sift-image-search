@@ -1,15 +1,18 @@
 from queries import knnQuery, rangeQuery
 from database import truncateOrCreateDB, save_items_to_db
 from image_processing import process_image_directory, match_images
+import os
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
 
 app = Flask(__name__)
 
 
-@app.route('/image/<path:directory>/<path:filename>')
-def image_display(directory, filename):
-    return send_from_directory(directory, filename)
+@app.route('/<path:path>')
+def image_display(path):
+    directory = os.path.dirname(path)
+    filename = os.path.basename(path)
+    return send_from_directory('/' + directory, filename)
 
 
 @app.route('/')

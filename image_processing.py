@@ -23,12 +23,13 @@ def process_image_directory(path):
     image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp']
     images = []
 
-    obj = os.scandir(path)
+    full_path = os.path.abspath(os.path.expanduser(path))
+    obj = os.scandir(full_path)
 
     for entry in obj:
         if entry.is_file():
             if any(entry.name.lower().endswith(ext) for ext in image_extensions):
-                processed_image = process_image(path, entry.name)
+                processed_image = process_image(full_path, entry.name)
                 images.append(processed_image)
     return images
 
