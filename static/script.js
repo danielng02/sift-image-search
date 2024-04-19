@@ -64,6 +64,14 @@ function visualise() {
     }
 
     const rangeEnabled = document.getElementById("rangeEnabled").checked;
+    const kEnabled = document.getElementById("kEnabled").checked;
+
+    const noQuery = document.getElementById("noQuerySelected");
+    if(!kEnabled && !rangeEnabled) {
+        noQuery.innerText = "No query type selected";
+        return;
+    }
+    noQuery.innerText = "";
 
     const url = new URL('/visualise', window.location.origin);
     url.searchParams.append('kNN', kNN);
