@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 from tinydb import TinyDB
-import pandas
 
 def rangeQuery(range):
     matches_db = TinyDB('matches_db.json')
@@ -32,15 +31,3 @@ def knnQuery(knn):
         passing_matches[image] = top_k_records
 
     return passing_matches
-
-def json_to_df(data):
-    dfs = []
-    for key, values in data.items():
-        df = pandas.DataFrame(values)
-        try:  
-            dfs.append(df)
-        except Exception as e:
-            continue
-    if dfs:
-        return pandas.concat(dfs, ignore_index=True)
-    return pandas.DataFrame()
