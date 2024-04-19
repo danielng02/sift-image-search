@@ -13,8 +13,6 @@ class ProcessedImage:
 class ImageMatch:
     def __init__(self, score, image1, image2, same):
         self.score = score
-        self.image1 = image1
-        self.image2 = image2
         self.image1_name = image1.name
         self.image2_name = image2.name
         self.image1_path = image1.path

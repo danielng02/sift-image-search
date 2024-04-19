@@ -9,7 +9,7 @@ def rangeQuery(range):
 
     records_by_image = defaultdict(list)
     for record in all_records:
-        records_by_image[record['image1']['name']].append(record)
+        records_by_image[record['image1_name']].append(record)
 
     high_score_records_by_image = {}
     for image, records in records_by_image.items():
@@ -23,7 +23,7 @@ def knnQuery(knn):
     all_records = matches_db.all()
     records_by_image = defaultdict(list)
     for record in all_records:
-        records_by_image[record['image1']['name']].append(record)
+        records_by_image[record['image1_name']].append(record)
 
     top_two_records_by_image = {}
     for image, records in records_by_image.items():
@@ -37,8 +37,8 @@ def json_to_df(data):
     for key, values in data.items():
         df = pandas.DataFrame(values)
         try:  
-            df['image1'] = df['image1'].apply(lambda x: x if isinstance(x, str) else x['path'])
-            df['image2'] = df['image2'].apply(lambda x: x if isinstance(x, str) else x['path'])
+            df['image1_name'] = df['image1_name'].apply(lambda x: x if isinstance(x, str) else x['path'])
+            df['image2_name'] = df['image2_name'].apply(lambda x: x if isinstance(x, str) else x['path'])
             df['image'] = key
             dfs.append(df)
         except Exception as e:

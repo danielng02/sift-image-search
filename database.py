@@ -14,9 +14,6 @@ def save_items_to_db(db, items):
 def object_to_dict(obj):
     obj_dict = {}
     for attr in vars(obj):
-        if attr != 'image' and attr != 'descriptors':
-            value = getattr(obj, attr)
-            if isinstance(value, ProcessedImage):
-                value = object_to_dict(value)
-            obj_dict[attr] = value
+        value = getattr(obj, attr)
+        obj_dict[attr] = value
     return obj_dict
