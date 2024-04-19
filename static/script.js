@@ -2,7 +2,7 @@ function load() {
     const path1 = document.getElementById("path1").value;
     const path2 = document.getElementById("path2").value;
 
-    const messageLabel = document.getElementById("message");
+    const messageLabel = document.getElementById("loadMessage");
     messageLabel.innerText = "";
 
     fetch('/load', {
