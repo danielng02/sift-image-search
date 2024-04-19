@@ -7,30 +7,31 @@ def rangeQuery(range):
     matches_db = TinyDB('matches_db.json')
     all_records = matches_db.all()
 
-    records_by_image = defaultdict(list)
+    all_records_dict = defaultdict(list)
     for record in all_records:
-        records_by_image[record['image1_name']].append(record)
+        all_records_dict[record['image1_name']].append(record)
 
-    high_score_records_by_image = {}
-    for image, records in records_by_image.items():
+    passing_matches = {}
+    for image, records in all_records_dict.items():
         high_score_records = [record for record in records if int(record['score']) >= range]
-        high_score_records_by_image[image] = high_score_records
+        passing_matches[image] = high_score_records
 
-    return high_score_records_by_image
+    return passing_matches
 
 def knnQuery(knn):
     matches_db = TinyDB('matches_db.json')
     all_records = matches_db.all()
-    records_by_image = defaultdict(list)
+    
+    all_records_dict = defaultdict(list)
     for record in all_records:
-        records_by_image[record['image1_name']].append(record)
+        all_records_dict[record['image1_name']].append(record)
 
-    top_two_records_by_image = {}
-    for image, records in records_by_image.items():
-        top_two_records = sorted(records, key=lambda record: record['score'], reverse=True)[:knn]
-        top_two_records_by_image[image] = top_two_records
+    passing_matches = {}
+    for image, records in all_records_dict.items():
+        top_k_records = sorted(records, key=lambda record: record['score'], reverse=True)[:knn]
+        passing_matches[image] = top_k_records
 
-    return top_two_records_by_image
+    return passing_matches
 
 def json_to_df(data):
     dfs = []
