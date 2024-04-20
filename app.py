@@ -33,10 +33,10 @@ def load_directories():
         if not processed_img1 or not processed_img2:
             return jsonify(message="No images found"), 400
 
-        matches = match_images(processed_img1, processed_img2)
-        save_items_to_db(matches_db, matches)
-        matches = match_images(processed_img2, processed_img1)
-        save_items_to_db(matches_db, matches)
+        matches1 = match_images(processed_img1, processed_img2)
+        matches2 = match_images(processed_img2, processed_img1)
+        intersection = matches1.union(matches2)
+        save_items_to_db(matches_db, intersection)
 
         return jsonify(message="Images processed and saved successfully"), 200
     except Exception as e:

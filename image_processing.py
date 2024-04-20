@@ -11,13 +11,20 @@ class ProcessedImage:
 
 
 class ImageMatch:
-    def __init__(self, score, image1, image2, same):
+    def __init__(self, score, image1, image2):
         self.score = score
         self.image1_name = image1.name
         self.image2_name = image2.name
         self.image1_path = image1.path
         self.image2_path = image2.path
-        self.same = same
+    def __hash__(self):
+        return hash((self.image1_name, self.image1_path, self.image2_name, self.image2_path))
+
+    def __eq__(self, other):
+        if isinstance(other, ImageMatch):
+            return (self.image1_name, self.image1_path, self.image2_name, self.image2_path) == (other.image1_name, other.image1_path, other.image2_name, other.image2_path)
+        return False
+        
 
 def process_image_directory(path):
     image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp']
@@ -54,19 +61,16 @@ def knn_match_good_descriptors(image1, image2):
     return good
 
 def match_images(directory1, directory2, k=2, range_ratio=0.75):
-    image_matches = []
+    image_matches = set()
 
     for image1 in directory1:
         for image2 in directory2:
-
             if np.array_equal(image1.image, image2.image):
-                image_match = ImageMatch(0, image1, image2, True)
-                image_matches.append(image_match)
                 continue
 
             good = knn_match_good_descriptors(image1, image2)
 
-            image_match = ImageMatch(len(good), image1, image2, False)
-            image_matches.append(image_match)
-
+            image_match = ImageMatch(len(good), image1, image2)
+            image_matches.add(image_match)
+            
     return image_matches
