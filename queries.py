@@ -12,7 +12,7 @@ def rangeQuery(range):
 
     passing_matches = {}
     for image, records in all_records_dict.items():
-        high_score_records = [record for record in records if int(record['score']) >= range]
+        high_score_records = [record for record in records if (int(record['score']) >= range)]
         passing_matches[image] = high_score_records
 
     return passing_matches
@@ -27,7 +27,7 @@ def knnQuery(knn):
 
     passing_matches = {}
     for image, records in all_records_dict.items():
-        top_k_records = sorted(records, key=lambda record: record['score'], reverse=True)[:knn]
+        top_k_records = sorted(records, key=lambda record: -int(record['score']))[:knn]
         passing_matches[image] = top_k_records
 
     return passing_matches
