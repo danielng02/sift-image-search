@@ -27,7 +27,7 @@ class ImageMatch:
         
 
 def process_image_directory(path):
-    image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp']
+    image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff']
     images = []
 
     full_path = os.path.abspath(os.path.expanduser(path))
